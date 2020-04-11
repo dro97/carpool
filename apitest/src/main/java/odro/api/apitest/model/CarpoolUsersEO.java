@@ -41,12 +41,21 @@ public class CarpoolUsersEO {
 	private String email;
 	@Column(name = "password")
 	private String password;
+	@Column(name = "usercode")
+	private String userCode;	
 	@OneToMany(mappedBy = "users")
 	 private List<ExtraInfoEO>  extras;
 	@OneToMany(mappedBy = "users")
 	 private List<ParticipationsEO>  participations;
 	
 
+	public String getUserCode() {
+	return userCode;
+	}
+	
+	public void setUserCode(String userCode) {
+		this.userCode = userCode;
+	}
 
 
 	public Long getId() {

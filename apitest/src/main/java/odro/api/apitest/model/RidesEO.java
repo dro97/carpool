@@ -34,9 +34,43 @@ public class RidesEO {
 	private String description;
 	@Column(name = "ride_date")
 	private Timestamp rideDate;
-	
+	@Column(name = "ridercode")
+	private String riderCode;
+	@Column(name = "status")
+	private String status;	
+	@Column(name = "ridecode")
+	private String rideCode;	
 	@OneToMany(mappedBy = "users")
-	 private List<ParticipationsEO>  participations;
+	private List<ParticipationsEO>  participations;
+	
+
+
+	
+	
+	
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
+	}
+
+	public String getRideCode() {
+		return rideCode;
+	}
+
+	public void setRideCode(String rideCode) {
+		this.rideCode = rideCode;
+	}
+
+	public String getRiderCode() {
+		return riderCode;
+	}
+
+	public void setRiderCode(String riderCode) {
+		this.riderCode = riderCode;
+	}
 
 	public Long getIdRides() {
 		return idRides;

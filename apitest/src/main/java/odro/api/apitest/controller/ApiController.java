@@ -1,48 +1,73 @@
 package odro.api.apitest.controller;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import javax.validation.Valid;
 
-import org.hibernate.mapping.Set;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import net.bytebuddy.implementation.Implementation.Context.ExtractableView;
-import odro.api.apitest.model.CarpoolUsersEO;
-import odro.api.apitest.model.ExtraInfoEO;
-import odro.api.apitest.model.ParticipationsEO;
-import odro.api.apitest.model.RequestApiBean;
-import odro.api.apitest.model.ResponseApiBean;
-import odro.api.apitest.model.RidesEO;
-import odro.api.apitest.repository.IExtraRepository;
-import odro.api.apitest.repository.IParticipationsRepository;
-import odro.api.apitest.repository.IRidesRepository;
-import odro.api.apitest.repository.IUsuarioRepository;
+import odro.api.apitest.model.GeneralRideRequestBean;
+import odro.api.apitest.model.ResponseBean;
+import odro.api.apitest.model.RidesRequestBean;
+import odro.api.apitest.model.RidesTodayResponseBean;
+import odro.api.apitest.model.SignUpRequestBean;
+import odro.api.apitest.service.IRegistrationService;
+import odro.api.apitest.service.IRidesService;
+
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/carpool")
 public class ApiController {
-	@Autowired
-	private IUsuarioRepository usuarioRepo;
-	@Autowired
-	private IExtraRepository extrarepo;
-	@Autowired
-	private IRidesRepository ridesRepo;
-	@Autowired
-	private IParticipationsRepository partRepo;
-	
-	
-	 @PostMapping("/blog")
-	    public ResponseApiBean create(@RequestBody RequestApiBean body){
-		 
-	
-	
-		 return null;
-	      
-	    }
 
+	@Autowired
+	private IRegistrationService register;
+	@Autowired
+	private IRidesService rides;
+	
+	
+	@RequestMapping(path = "/signup", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	public ResponseEntity<ResponseBean> signUP(@Valid @RequestBody SignUpRequestBean datosIn) {
+		
+		/*
+		 * se regresa la respuesta
+		 */
+		return (register.respuestaSignUp(datosIn));
+		
+		
+	}
+	
+	
+	@RequestMapping(path = "/newRide", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	public ResponseEntity<ResponseBean> newRide(@Valid @RequestBody RidesRequestBean datosIn) {
+		
+		/*
+		 * se regresa la respuesta
+		 */
+		return (rides.newRide(datosIn));
+		
+		
+	}
+	
+	@RequestMapping(path = "/ride_operation", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	public ResponseEntity<ResponseBean> joinRide(@Valid @RequestBody GeneralRideRequestBean datosIn) {
+		
+		/*
+		 * se regresa la respuesta
+		 */
+		return (rides.joinRide(datosIn));
+		
+		
+	}
+	
+	@RequestMapping(path = "/ride_info", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	public ResponseEntity<RidesTodayResponseBean> ridesInfo(@Valid @RequestBody RidesRequestBean datosIn){
+		
+		return (rides.rideInfo(datosIn));
+	}
+	
+	
 }
