@@ -23,8 +23,9 @@ public interface IRidesRepository extends JpaRepository<RidesEO, Long>{
 	Optional<RidesEO> obtenerEntidad(@Param(value = "rideCode") String rideCode);
 	
 	
-	@Query("Select c from RidesEO c where c.status ='CREADO' and c.rideDate BETWEEN :startDate AND :endDate ")
-	List<RidesEO> rideToday(@Param(value = "startDate")Timestamp startDate,@Param(value = "endDate")Timestamp endDate);
+	@Query("Select c from RidesEO c where (c.status ='CREADO' and "+ 
+			" :driverCode IS NULL OR c.riderCode=:driverCode)   and c.rideDate BETWEEN :startDate AND :endDate ")
+	List<RidesEO> rideToday(@Param(value = "startDate")Timestamp startDate,@Param(value = "endDate")Timestamp endDate,@Param("driverCode")Optional<String>driverCode);
 	
 	
 }

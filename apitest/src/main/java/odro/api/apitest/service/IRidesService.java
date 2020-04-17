@@ -3,6 +3,8 @@
  */
 package odro.api.apitest.service;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.http.ResponseEntity;
 
 import odro.api.apitest.model.GeneralRideRequestBean;
@@ -16,12 +18,12 @@ import odro.api.apitest.model.RidesTodayResponseBean;
  */
 public interface IRidesService {
 
-	ResponseEntity<ResponseBean> newRide(RidesRequestBean request);
+	ResponseEntity<ResponseBean> newRide(RidesRequestBean request,HttpServletRequest data);
 	
-	ResponseEntity<ResponseBean> joinRide(GeneralRideRequestBean request);
+	ResponseEntity<ResponseBean> joinRide(GeneralRideRequestBean request,HttpServletRequest data);
 	
-	ResponseEntity<ResponseBean> cancelRide(GeneralRideRequestBean request);
+	ResponseEntity<ResponseBean> cancelRide(GeneralRideRequestBean request,HttpServletRequest data);
 	
-	ResponseEntity<RidesTodayResponseBean> rideInfo(RidesRequestBean request);
+	ResponseEntity<RidesTodayResponseBean> rideInfo(RidesRequestBean request,HttpServletRequest data);
 	
 }

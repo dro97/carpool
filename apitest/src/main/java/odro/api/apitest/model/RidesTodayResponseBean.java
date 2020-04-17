@@ -1,7 +1,5 @@
 package odro.api.apitest.model;
 
-import java.util.List;
-
 public class RidesTodayResponseBean {
  
 	

@@ -5,6 +5,7 @@ package odro.api.apitest.utils;
 
 import java.sql.Timestamp;
 import java.util.Random;
+import java.util.UUID;
 
 import odro.api.apitest.model.CarpoolUsersEO;
 import odro.api.apitest.model.RidesEO;
@@ -23,8 +24,8 @@ public  class MapeoBeanesUtil {
 		response.setEmail(data.getEmail());
 		response.setLastname(data.getLastname());
 		response.setName(data.getName());
-		response.setNick(data.getNick());
-		response.setPassword(data.getPassword());
+		response.setNick(data.getNick());		
+		response.setPassword(EncryptionUtil.decrypt(data.getPassword()));
 		response.setPhone(data.getPhone());
 		response.setUniversity(data.getUniversity());
 		response.setUserType(data.getUserType());
@@ -65,6 +66,9 @@ public  class MapeoBeanesUtil {
 		entidad.setOrigin(request.getOrigin());
 		entidad.setRiderCode(request.getDriver());
 		entidad.setRideDate(Timestamp.valueOf(request.getDate()));
+		
+		entidad.setRideCode(UUID.randomUUID().toString());
+		
 		entidad.setStatus("CREADO");
 		
 		return entidad;

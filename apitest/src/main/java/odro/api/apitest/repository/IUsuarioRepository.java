@@ -27,6 +27,7 @@ public interface IUsuarioRepository extends JpaRepository<CarpoolUsersEO, Long>{
 	@Query("SELECT c from  CarpoolUsersEO c where c.userCode =:userCode")
 	CarpoolUsersEO getNick(@Param(value = "userCode") String userCode);
 	
-	
+	@Query("SELECT c from  CarpoolUsersEO c where c.email =:email and password =:passw")
+	Optional<CarpoolUsersEO> verificarLogin(@Param(value = "email") String email,@Param(value = "passw") String password);
 	
 }

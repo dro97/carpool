@@ -71,7 +71,8 @@ public class RidesRequestBean {
 	public void setDriver(String driver) {
 		this.driver = driver;
 	}
-	
+
+
 	
 	
 	

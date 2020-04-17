@@ -10,6 +10,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import odro.api.apitest.model.AuthenticationResponse;
 import odro.api.apitest.model.CarpoolUsersEO;
 import odro.api.apitest.model.GeneralRideRequestBean;
 import odro.api.apitest.model.ParticipationsEO;
@@ -26,9 +28,11 @@ import odro.api.apitest.model.RidesInfoRequestBean;
 import odro.api.apitest.model.RidesRequestBean;
 import odro.api.apitest.model.RidesResponseBean;
 import odro.api.apitest.model.RidesTodayResponseBean;
+import odro.api.apitest.repository.IConexionRepository;
 import odro.api.apitest.repository.IParticipationsRepository;
 import odro.api.apitest.repository.IRidesRepository;
 import odro.api.apitest.repository.IUsuarioRepository;
+import odro.api.apitest.utils.ApiConstants;
 import odro.api.apitest.utils.MapeoBeanesUtil;
 
 /**
@@ -45,14 +49,19 @@ public class RidesService implements IRidesService {
 	private IUsuarioRepository userRepo;
 	@Autowired
 	private IParticipationsRepository partRepo;
-	
+	@Autowired
+	private IConexionRepository conecRepo;
 	@Override
-	public ResponseEntity<ResponseBean> newRide(RidesRequestBean request) {
+	public ResponseEntity<ResponseBean> newRide(RidesRequestBean request,HttpServletRequest data) {
 
 		ResponseEntity<ResponseBean> response  = null;
 		
+		AuthenticationResponse validacionToken = new AuthenticationResponse();
+		
+		validacionToken = validacion(request.getDriver(),data);
 		
 		ResponseBean respuesta = new ResponseBean();
+		if(validacionToken.getCodeError().equals(ApiConstants.COD_OK_TOKEN)) {
 		
 		RidesEO rideInsertado = new RidesEO();
 		
@@ -96,32 +105,73 @@ public class RidesService implements IRidesService {
 			
 		}
 	
+		}else {
+			
+			
+			respuesta.setCodigoError(validacionToken.getCodeError());
+			respuesta.setMsgError(validacionToken.getMsgError());
+			
+			
+		}
 		response = new ResponseEntity<ResponseBean>(respuesta,HttpStatus.OK);
-		
 		return response;
 	}
 
 	@Override
-	public ResponseEntity<ResponseBean> joinRide(GeneralRideRequestBean request) {
+	public ResponseEntity<ResponseBean> joinRide(GeneralRideRequestBean request,HttpServletRequest data) {
 		
 		ResponseEntity<ResponseBean> response  = null;
 		
 		ResponseBean respuesta = new ResponseBean();
 		
-		if(request.getStatus()!=null) {
+		
+AuthenticationResponse validacionToken = new AuthenticationResponse();
+RidesEO entidadNueva = new RidesEO();
+		
+		validacionToken = validacion(request.getNick(),data);
+		if(validacionToken.getCodeError().equals(ApiConstants.COD_OK_TOKEN)) {
+		
+		
+		
+		
+		if(request.getStatus().equals("END")) {
 			
 			Optional<RidesEO> oldEntity2 = ridesRepo.obtenerEntidad(request.getRideCode());
 			if (oldEntity2.isPresent()) {
 			
-				RidesEO entidadNueva = new RidesEO();
 				
 				entidadNueva = oldEntity2.get();
 				entidadNueva.setStatus("END");
+				ridesRepo.saveAndFlush(entidadNueva);
+				
+				respuesta.setCodigoError("COD000");
+				respuesta.setDescription("END");
+				respuesta.setMsgError("Viaje finalizado exitosamente");
 				
 			}
 			
 		}
 		else {
+			if(request.getStatus().equals("START")) {
+				
+				Optional<RidesEO> oldEntity2 = ridesRepo.obtenerEntidad(request.getRideCode());
+				if (oldEntity2.isPresent()) {
+				
+					
+					entidadNueva = oldEntity2.get();
+					entidadNueva.setStatus("START");
+					ridesRepo.saveAndFlush(entidadNueva);
+					respuesta.setCodigoError("COD000");
+					respuesta.setDescription("START");
+					respuesta.setMsgError("Viaje iniciado exitosamente");
+					
+				}
+				
+			}
+			else {
+				
+			
+			
 		 Optional<CarpoolUsersEO> oldEntity = userRepo.obtenerEntidad(request.getNick());
 			if (oldEntity.isPresent()) {
 				
@@ -181,10 +231,15 @@ public class RidesService implements IRidesService {
 						}
 					}
 				}
+				}
 			}
 		
 	}
-	
+		}else {
+			
+			respuesta.setCodigoError(validacionToken.getCodeError());
+			respuesta.setMsgError(validacionToken.getMsgError());
+		}
 			response = new ResponseEntity<ResponseBean>(respuesta,HttpStatus.OK);
 			
 			return response;
@@ -193,13 +248,20 @@ public class RidesService implements IRidesService {
 	}
 
 	@Override
-	public ResponseEntity<ResponseBean> cancelRide(GeneralRideRequestBean request) {
+	public ResponseEntity<ResponseBean> cancelRide(GeneralRideRequestBean request,HttpServletRequest data) {
 		
 		ResponseEntity<ResponseBean> response  = null;
 		
 		ResponseBean respuesta = new ResponseBean();
 		
 		ParticipationsEO entidad = new ParticipationsEO();
+		
+		
+AuthenticationResponse validacionToken = new AuthenticationResponse();
+		
+		validacionToken = validacion(request.getNick(),data);
+		if(validacionToken.getCodeError().equals(ApiConstants.COD_OK_TOKEN)) {
+		
 		
 		 Optional<CarpoolUsersEO> oldEntity = userRepo.obtenerEntidad(request.getNick());
 			if (oldEntity.isPresent()) {
@@ -214,7 +276,7 @@ public class RidesService implements IRidesService {
 					
 					
 					respuesta.setCodigoError("COD00");
-					respuesta.setMsgError("Se agrego al viaje exitosamente");
+					respuesta.setMsgError("Se cancelo el viaje exitosamente");
 				}
 				else {
 					
@@ -230,7 +292,10 @@ public class RidesService implements IRidesService {
 					
 				}
 		
-		
+		}else {
+			respuesta.setCodigoError(validacionToken.getCodeError());
+			respuesta.setMsgError(validacionToken.getMsgError());
+		}
 		
 			response = new ResponseEntity<ResponseBean>(respuesta,HttpStatus.OK);
 		
@@ -238,15 +303,25 @@ public class RidesService implements IRidesService {
 	}
 
 	@Override
-	public ResponseEntity<RidesTodayResponseBean> rideInfo(RidesRequestBean request) {
+	public ResponseEntity<RidesTodayResponseBean> rideInfo(RidesRequestBean request,HttpServletRequest data) {
 		
 		ResponseEntity<RidesTodayResponseBean> response  = null;
+	
+AuthenticationResponse validacionToken = new AuthenticationResponse();
+RidesTodayResponseBean respuesta = new  RidesTodayResponseBean();
 		
-	List<RidesEO> listaRides = ridesRepo.rideToday(Timestamp.valueOf(obtenerFecha()+" 07:00:00"),Timestamp.valueOf(obtenerFecha()+" 22:00:00"));
+		validacionToken = validacion(request.getDriver(),data);
+		if(validacionToken.getCodeError().equals(ApiConstants.COD_OK_TOKEN)) {
+			Optional<String> opt;
+			if(request.getDriver()!=null) {
+			opt = Optional.of(request.getDriver());
+			}else {
+				opt =null;
+			}
+	List<RidesEO> listaRides = ridesRepo.rideToday(Timestamp.valueOf(obtenerFecha()+" 07:00:00"),Timestamp.valueOf(obtenerFecha()+" 22:00:00"),opt);
 	
 	List<RidesInfoRequestBean> listaInfo = new ArrayList<RidesInfoRequestBean>();
 	
-	RidesTodayResponseBean respuesta = new  RidesTodayResponseBean();
 	
 	
 	RidesResponseBean infoRides = new RidesResponseBean();
@@ -270,8 +345,8 @@ public class RidesService implements IRidesService {
 			temporal.setDate(listaRides.get(i).getRideDate().toString());
 			temporal.setDestiny(listaRides.get(i).getDestiny());
 			temporal.setDriver(userRepo.getNick(listaRides.get(i).getRiderCode()).getNick());
-			temporal.setOrigin(listaRides.get(i).getDestiny());
-			temporal.setRidecode(listaRides.get(i).getRideDate().toString());
+			temporal.setOrigin(listaRides.get(i).getOrigin());
+			temporal.setRidecode(listaRides.get(i).getRideCode().toString());
 			
 			List<ParticipationsEO>partTemporal = new ArrayList<ParticipationsEO>();
 			
@@ -317,6 +392,14 @@ public class RidesService implements IRidesService {
 		
 		
 	}
+	}else {
+		
+		ResponseBean respuestaBean = new ResponseBean(); 
+		respuestaBean.setCodigoError(validacionToken.getCodeError());
+		respuestaBean.setMsgError(validacionToken.getMsgError());
+		
+		respuesta.setResponse(respuestaBean);
+	}
 	
 	response = new ResponseEntity<RidesTodayResponseBean>(respuesta,HttpStatus.OK);
 	
@@ -340,7 +423,25 @@ public class RidesService implements IRidesService {
 	}
 		
 		
-		
+		private AuthenticationResponse validacion(String nick,HttpServletRequest data) {
+			
+			AuthenticationResponse authResponse = new AuthenticationResponse();
+			
+			final String authorizationHeader = data.getHeader("Authorization");
+			
+			String  jwt ="";
+			if(authorizationHeader ==null) {
+			
+				authResponse.setCodeError("COD495");
+				authResponse.setMsgError("Token inexistente");
+			}else {
+				jwt= authorizationHeader.substring(7);
+				
+				authResponse =conecRepo.getToken(nick, jwt);
+			}
+			
+			return authResponse;
+		}
 		
 		
 	
